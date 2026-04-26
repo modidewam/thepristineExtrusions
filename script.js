@@ -22,9 +22,11 @@ const photoConfigs = [
     preview: document.getElementById("visitorPhotoPreview"),
     dataInput: document.getElementById("visitorPhotoData"),
     startBtn: document.getElementById("startCameraBtn"),
+    flipBtn: document.getElementById("flipVisitorCameraBtn"),
     captureBtn: document.getElementById("capturePhotoBtn"),
     retakeBtn: document.getElementById("retakePhotoBtn"),
     stream: null,
+    facingMode: "environment",
   },
   {
     key: "inward",
@@ -34,9 +36,11 @@ const photoConfigs = [
     preview: document.getElementById("inwardPhotoPreview"),
     dataInput: document.getElementById("inwardPhotoData"),
     startBtn: document.getElementById("startInwardCameraBtn"),
+    flipBtn: document.getElementById("flipInwardCameraBtn"),
     captureBtn: document.getElementById("captureInwardPhotoBtn"),
     retakeBtn: document.getElementById("retakeInwardPhotoBtn"),
     stream: null,
+    facingMode: "environment",
   },
   {
     key: "outward",
@@ -46,9 +50,11 @@ const photoConfigs = [
     preview: document.getElementById("outwardPhotoPreview"),
     dataInput: document.getElementById("outwardPhotoData"),
     startBtn: document.getElementById("startOutwardCameraBtn"),
+    flipBtn: document.getElementById("flipOutwardCameraBtn"),
     captureBtn: document.getElementById("captureOutwardPhotoBtn"),
     retakeBtn: document.getElementById("retakeOutwardPhotoBtn"),
     stream: null,
+    facingMode: "environment",
   },
 ];
 
@@ -212,6 +218,18 @@ function stopCameraCapture(config) {
   });
   config.stream = null;
   config.video.srcObject = null;
+  config.video.style.transform = "";
+  if (config.flipBtn) {
+    config.flipBtn.disabled = true;
+  }
+}
+
+function applyCameraMirror(config) {
+  if (!config || !config.video) {
+    return;
+  }
+
+  config.video.style.transform = config.facingMode === "user" ? "scaleX(-1)" : "";
 }
 
 function stopAllOtherCameras(activeKey) {
@@ -235,11 +253,21 @@ async function startCameraCapture(config) {
   try {
     stopAllOtherCameras(config.key);
     stopCameraCapture(config);
-    config.stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    const constraints = {
+      video: {
+        facingMode: { ideal: config.facingMode || "environment" },
+      },
+      audio: false,
+    };
+    config.stream = await navigator.mediaDevices.getUserMedia(constraints);
     config.video.srcObject = config.stream;
     config.video.style.display = "block";
     config.preview.style.display = "none";
     config.captureBtn.disabled = false;
+    if (config.flipBtn) {
+      config.flipBtn.disabled = false;
+    }
+    applyCameraMirror(config);
   } catch (error) {
     alert("Unable to access camera. Please allow camera permission.");
   }
@@ -279,6 +307,9 @@ function resetPhotoCapture(config) {
   config.video.style.display = "block";
   config.captureBtn.disabled = true;
   config.retakeBtn.disabled = true;
+  if (config.flipBtn) {
+    config.flipBtn.disabled = !config.stream;
+  }
 }
 
 function printSingleEntry(serialNo, type, details, createdAt) {
@@ -385,6 +416,13 @@ photoConfigs.forEach((config) => {
   if (config.startBtn) {
     config.startBtn.addEventListener("click", () => {
       startCameraCapture(config);
+    });
+  }
+
+  if (config.flipBtn) {
+    config.flipBtn.addEventListener("click", async () => {
+      config.facingMode = config.facingMode === "user" ? "environment" : "user";
+      await startCameraCapture(config);
     });
   }
 
