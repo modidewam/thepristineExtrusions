@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Security Management Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="top-bar">
+    <div class="brand-block">
+      <img
+        class="brand-logo"
+        src="logo.jpeg"
+        alt="Pristine Extrusions Logo"
+      />
+      <div>
+        <h1>Pristine Extrusions</h1>
+        <p>Security Management Dashboard</p>
+      </div>
+    </div>
+    <p class="top-bar-note">Manage visitor, inward, and outward entries</p>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <button class="nav-btn active" data-target="visitor">Visitor Page</button>
+      <button class="nav-btn" data-target="inward">Inward Page</button>
+      <button class="nav-btn" data-target="outward">Outward Page</button>
+    </aside>
+
+    <section class="content">
+      <div id="visitor" class="panel active">
+        <h2>Visitor Entry</h2>
+        <form class="entry-form" data-form-type="Visitor">
+          <div class="form-grid">
+            <label>
+              Name :
+              <input type="text" name="name" required />
+            </label>
+            <label>
+              Phone :
+              <input type="tel" name="phone" required />
+            </label>
+            <label class="full-width">
+              Company Name :
+              <input type="text" name="company" required />
+            </label>
+            <label class="full-width">
+              Purpose of Visit :          
+              <input type="text" name="purpose" required />
+            </label>
+            <div class="full-width photo-capture-box">
+              <p class="photo-title">Visitor Photo Capture</p>
+              <div class="photo-preview-wrap">
+                <video id="visitorVideo" class="photo-video" autoplay playsinline></video>
+                <img id="visitorPhotoPreview" class="photo-preview" alt="Captured visitor photo preview" />
+              </div>
+              <input type="hidden" name="visitorPhotoData" id="visitorPhotoData" />
+              <div class="photo-actions no-print">
+                <button type="button" id="startCameraBtn" class="secondary-btn">Start Camera</button>
+                <button type="button" id="capturePhotoBtn" class="secondary-btn" disabled>Capture Photo</button>
+                <button type="button" id="retakePhotoBtn" class="secondary-btn" disabled>Retake</button>
+              </div>
+              <canvas id="visitorCanvas" class="photo-canvas"></canvas>
+            </div>
+          </div>
+          <button type="submit">Add Visitor Entry</button>
+        </form>
+
+        <div class="log-group panel-log">
+          <h3>Visitor Entry Logs</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Sr No</th>
+                  <th>Details</th>
+                  <th>Created At</th>
+                  <th class="no-print">Action</th>
+                </tr>
+              </thead>
+              <tbody id="visitorLogBody">
+                <tr>
+                  <td colspan="4" class="empty-row">No visitor entries yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="inward" class="panel">
+        <h2>Inward Entry</h2>
+        <form class="entry-form" data-form-type="Inward">
+          <div class="form-grid">
+            <label>
+              Name :
+              <input type="text" name="name" required />
+            </label>
+            <label>
+              Phone :
+              <input type="tel" name="phone" required />
+            </label>
+            
+            <label>
+              Vehicle Details :
+              <input type="text" name="vehicle" required />
+            </label>
+            <label>
+              Material :
+              <input type="text" name="material" required />
+            </label>
+            <label>
+              Weight :
+              <input type="number" name="weight" min="0" step="0.01" required />
+            </label>
+            <label>
+              Unit
+              <select name="unit" required>
+                <option value="">Select unit</option>
+                <option value="kg">kg</option>
+                <option value="piece">piece</option>
+                <option value="box">box</option>
+              </select>
+            </label>
+            <label class="full-width">
+              Company Name :
+              <input type="text" name="company" required />
+            </label>
+            <label>
+              From :
+              <input type="text" name="fromDetails" required />
+            </label>
+            <label>
+              To :
+              <input type="text" name="toDetails" required />
+            </label>
+            <div class="full-width photo-capture-box">
+              <p class="photo-title">Inward Photo Capture</p>
+              <div class="photo-preview-wrap">
+                <video id="inwardVideo" class="photo-video" autoplay playsinline></video>
+                <img id="inwardPhotoPreview" class="photo-preview" alt="Captured inward photo preview" />
+              </div>
+              <input type="hidden" name="inwardPhotoData" id="inwardPhotoData" />
+              <div class="photo-actions no-print">
+                <button type="button" id="startInwardCameraBtn" class="secondary-btn">Start Camera</button>
+                <button type="button" id="captureInwardPhotoBtn" class="secondary-btn" disabled>Capture Photo</button>
+                <button type="button" id="retakeInwardPhotoBtn" class="secondary-btn" disabled>Retake</button>
+              </div>
+              <canvas id="inwardCanvas" class="photo-canvas"></canvas>
+            </div>
+          </div>
+          <button type="submit">Add Inward Entry</button>
+        </form>
+
+        <div class="log-group panel-log">
+          <h3>Inward Entry Logs</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Sr No</th>
+                  <th>Details</th>
+                  <th>Created At</th>
+                  <th class="no-print">Action</th>
+                </tr>
+              </thead>
+              <tbody id="inwardLogBody">
+                <tr>
+                  <td colspan="4" class="empty-row">No inward entries yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="outward" class="panel">
+        <h2>Outward Entry</h2>
+        <form class="entry-form" data-form-type="Outward">
+          <div class="form-grid">
+            <label>
+              Name :
+              <input type="text" name="name" required />
+            </label>
+            <label>
+              Phone :
+              <input type="tel" name="phone" required />
+            </label>
+            <label>
+              Vehicle Details :
+              <input type="text" name="vehicle" required />
+            </label>
+            <label>
+              Material :
+              <input type="text" name="material" required />
+            </label>
+            <label>
+              Weight :
+              <input type="number" name="weight" min="0" step="0.01" required />
+            </label>
+            <label>
+              Unit :
+              <select name="unit" required>
+                <option value="">Select unit</option>
+                <option value="kg">kg</option>
+                <option value="ton">ton</option>
+                <option value="piece">piece</option>
+                <option value="box">box</option>
+              </select>
+            </label>
+            <label class="full-width">
+              Company Name :
+              <input type="text" name="company" required />
+            </label>
+            <label class="full-width">
+              From :
+              <input type="text" name="fromDetails" required />
+            </label>
+            <label class="full-width">
+              To :
+              <input type="text" name="toDetails" required />
+            </label>
+            <div class="full-width photo-capture-box">
+              <p class="photo-title">Outward Photo Capture</p>
+              <div class="photo-preview-wrap">
+                <video id="outwardVideo" class="photo-video" autoplay playsinline></video>
+                <img id="outwardPhotoPreview" class="photo-preview" alt="Captured outward photo preview" />
+              </div>
+              <input type="hidden" name="outwardPhotoData" id="outwardPhotoData" />
+              <div class="photo-actions no-print">
+                <button type="button" id="startOutwardCameraBtn" class="secondary-btn">Start Camera</button>
+                <button type="button" id="captureOutwardPhotoBtn" class="secondary-btn" disabled>Capture Photo</button>
+                <button type="button" id="retakeOutwardPhotoBtn" class="secondary-btn" disabled>Retake</button>
+              </div>
+              <canvas id="outwardCanvas" class="photo-canvas"></canvas>
+            </div>
+          </div>
+          <button type="submit">Add Outward Entry</button>
+        </form>
+
+        <div class="log-group panel-log">
+          <h3>Outward Entry Logs</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Sr No</th>
+                  <th>Details</th>
+                  <th>Created At</th>
+                  <th class="no-print">Action</th>
+                </tr>
+              </thead>
+              <tbody id="outwardLogBody">
+                <tr>
+                  <td colspan="4" class="empty-row">No outward entries yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
