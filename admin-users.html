@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - User Management</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .admin-wrap {
+        padding: 20px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .admin-card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        padding: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top-bar">
+      <div class="brand-block">
+        <img class="brand-logo" src="logo.jpeg" alt="Pristine Extrusions Logo" />
+        <div>
+          <h1>Pristine Extrusions</h1>
+          <p>Admin - User Management</p>
+        </div>
+      </div>
+      <div class="top-bar-note">
+        <div id="adminUserLine" style="font-size: 13px; opacity: 0.95;"></div>
+        <div
+          class="no-print"
+          style="margin-top: 8px; display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;"
+        >
+          <button type="button" id="goLogsBtn" class="secondary-btn">All Entry Logs</button>
+          <button type="button" id="logoutBtn" class="secondary-btn">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-wrap">
+      <section class="admin-card">
+        <h2 style="margin:0 0 8px;">User Management</h2>
+        <p style="margin:0 0 14px; color:#4b5870; font-size:14px;">
+          Admin only: add or remove login users.
+        </p>
+
+        <div class="photo-capture-box" style="background:#fff;">
+          <p class="photo-title">Add New User</p>
+          <form id="adminAddUserForm" class="user-form" style="max-width:520px;">
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+              <label>
+                Username
+                <input type="text" name="username" required />
+              </label>
+              <label>
+                Role
+                <select name="role" required>
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </label>
+              <label class="full-width">
+                Password
+                <input type="password" name="password" required />
+              </label>
+            </div>
+            <button type="submit">Add User</button>
+          </form>
+          <div id="adminUserFormMsg" style="margin-top:10px; font-size:14px;"></div>
+        </div>
+
+        <div class="log-group panel-log">
+          <h3>Existing Users</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Role</th>
+                  <th>Created At</th>
+                  <th class="no-print">Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTableBody">
+                <tr>
+                  <td colspan="4" class="empty-row">No users found.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="auth.js"></script>
+    <script src="admin-users.js"></script>
+  </body>
+</html>
+
