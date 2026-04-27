@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Security Management</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .admin-wrap {
+        padding: 20px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .admin-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .admin-actions .left,
+      .admin-actions .right {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .admin-card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        padding: 18px;
+      }
+
+      .admin-tabs {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .admin-tab-btn {
+        border: 1px solid #d9dfeb;
+        background: #f4f6fb;
+        color: #1e2430;
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: 13px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .admin-tab-btn.active {
+        background: #1b2a4a;
+        color: #fff;
+        border-color: #1b2a4a;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #f4f6fb;
+        border: 1px solid #d9dfeb;
+        font-size: 13px;
+        color: #1e2430;
+      }
+
+      .photo-thumb {
+        width: 70px;
+        height: 55px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #d6deec;
+        background: #101827;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top-bar">
+      <div class="brand-block">
+        <img class="brand-logo" src="logo.jpeg" alt="Pristine Extrusions Logo" />
+        <div>
+          <h1>Pristine Extrusions</h1>
+          <p>Admin Dashboard</p>
+        </div>
+      </div>
+      <div class="top-bar-note">
+        <div id="adminUserLine" style="font-size: 13px; opacity: 0.95;"></div>
+        <div class="no-print" style="margin-top: 8px; display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
+          <button type="button" id="goUsersBtn" class="secondary-btn">User Management</button>
+          <button type="button" id="logoutBtn" class="secondary-btn">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-wrap">
+      <section class="admin-card">
+        <div class="admin-actions no-print">
+          <div class="left">
+            <span class="pill" id="adminTitlePill">All Entry Logs</span>
+            <div class="admin-tabs" role="tablist" aria-label="Log type tabs">
+              <button type="button" id="tabAll" class="admin-tab-btn active">All</button>
+              <button type="button" id="tabVisitor" class="admin-tab-btn">Visitor</button>
+              <button type="button" id="tabInward" class="admin-tab-btn">Inward</button>
+              <button type="button" id="tabOutward" class="admin-tab-btn">Outward</button>
+            </div>
+          </div>
+          <div class="right">
+            <button type="button" id="exportBtn" class="secondary-btn">Export JSON</button>
+            <button type="button" id="clearBtn" class="secondary-btn">Clear All Logs</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Sr No</th>
+                <th>Details</th>
+                <th>Created At</th>
+                <th>Photo</th>
+                <th class="no-print">Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminLogsBody">
+              <tr>
+                <td colspan="6" class="empty-row">No logs found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="auth.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>
+

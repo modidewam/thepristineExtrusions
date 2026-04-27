@@ -2,6 +2,14 @@ const navButtons = document.querySelectorAll(".nav-btn");
 const panels = document.querySelectorAll(".panel");
 const forms = document.querySelectorAll(".entry-form");
 const contentSection = document.querySelector(".content");
+const logoutBtn = document.getElementById("logoutBtn");
+const authUserLine = document.getElementById("authUserLine");
+const usersNavBtn = document.getElementById("usersNavBtn");
+const adminDashBtn = document.getElementById("adminDashBtn");
+const addUserForm = document.getElementById("addUserForm");
+const userFormMsg = document.getElementById("userFormMsg");
+const usersTableBody = document.getElementById("usersTableBody");
+const usersPanel = document.getElementById("users");
 const STORAGE_KEY = "securityDashboardLogsV1";
 const logBodies = {
   visitor: document.getElementById("visitorLogBody"),
@@ -65,6 +73,44 @@ const logTypeMap = {
   Outward: "outward",
 };
 
+const activeSession = typeof authRequireLoginOrRedirect === "function" ? authRequireLoginOrRedirect() : null;
+if (activeSession && activeSession.role === "admin") {
+  window.location.href = "admin.html";
+}
+
+function setUserFormMessage(message, type) {
+  if (!userFormMsg) return;
+  userFormMsg.textContent = message || "";
+  userFormMsg.style.color = type === "error" ? "#8b1a1a" : "#0d7a4f";
+}
+
+function renderUsersTable() {
+  if (!usersTableBody || typeof authLoadUsers !== "function") return;
+  const users = authLoadUsers();
+  usersTableBody.innerHTML = "";
+
+  if (!users.length) {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td colspan="4" class="empty-row">No users found.</td>`;
+    usersTableBody.appendChild(row);
+    return;
+  }
+
+  users.forEach((u) => {
+    const row = document.createElement("tr");
+    const createdAt = u.createdAt ? new Date(u.createdAt).toLocaleString() : "";
+    row.innerHTML = `
+      <td>${u.username}</td>
+      <td>${u.role || "user"}</td>
+      <td>${createdAt}</td>
+      <td class="no-print">
+        <button type="button" class="row-print-btn user-delete-btn" data-username="${u.username}">Delete</button>
+      </td>
+    `;
+    usersTableBody.appendChild(row);
+  });
+}
+
 function loadStoredLogs() {
   try {
     const rawData = localStorage.getItem(STORAGE_KEY);
@@ -110,6 +156,7 @@ function getCurrentLogsFromUI() {
         serialNo: Number(cells[0].textContent?.trim() || "0"),
         details: cells[1].textContent?.trim() || "",
         createdAt: cells[2].textContent?.trim() || "",
+        photoData: row.dataset.photoData || "",
       });
     });
   });
@@ -130,6 +177,9 @@ function renderLogRow(logKey, entry, formTypeLabel) {
 
   const row = document.createElement("tr");
   row.dataset.formType = formTypeLabel;
+  if (entry.photoData) {
+    row.dataset.photoData = entry.photoData;
+  }
   row.innerHTML = `
     <td>${entry.serialNo}</td>
     <td>${entry.details}</td>
@@ -154,6 +204,14 @@ function hydrateLogsFromStorage() {
 }
 
 function showPanel(targetId) {
+  if (targetId === "users") {
+    const session = typeof authGetSession === "function" ? authGetSession() : null;
+    if (!session || session.role !== "admin") {
+      alert("Admin only.");
+      return;
+    }
+  }
+
   navButtons.forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.target === targetId);
   });
@@ -163,6 +221,33 @@ function showPanel(targetId) {
   });
 
   stopAllOtherCameras(targetId);
+}
+
+if (activeSession) {
+  if (authUserLine) {
+    authUserLine.textContent = `Logged in as: ${activeSession.username} (${activeSession.role})`;
+  }
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      authLogoutToLogin();
+    });
+  }
+
+  const isAdmin = activeSession.role === "admin";
+  if (usersNavBtn) {
+    usersNavBtn.style.display = isAdmin ? "block" : "none";
+  }
+  if (adminDashBtn) {
+    adminDashBtn.style.display = isAdmin ? "block" : "none";
+    adminDashBtn.addEventListener("click", () => {
+      window.location.href = "admin.html";
+    });
+  }
+  if (isAdmin) {
+    renderUsersTable();
+  } else if (usersPanel) {
+    usersPanel.style.display = "none";
+  }
 }
 
 function formatFormData(formType, formData) {
@@ -189,7 +274,7 @@ function formatFormData(formType, formData) {
   return entries.join(" | ");
 }
 
-function appendLogRow(formType, details) {
+function appendLogRow(formType, details, photoData) {
   const logKey = (formType || "").toLowerCase();
   if (!logBodies[logKey]) {
     return;
@@ -200,6 +285,7 @@ function appendLogRow(formType, details) {
     serialNo: serialCounters[logKey],
     details,
     createdAt: time,
+    photoData: photoData || "",
   };
 
   renderLogRow(logKey, entry, formType);
@@ -312,11 +398,18 @@ function resetPhotoCapture(config) {
   }
 }
 
-function printSingleEntry(serialNo, type, details, createdAt) {
+function printSingleEntry(serialNo, type, details, createdAt, photoData) {
   const printWindow = window.open("", "_blank", "width=900,height=700");
   if (!printWindow) {
     return;
   }
+
+  const photoHtml = photoData
+    ? `<div class="photo-block">
+        <div class="label">Photo:</div>
+        <img class="photo" src="${photoData}" alt="Captured photo" />
+      </div>`
+    : "";
 
   const html = `
     <!DOCTYPE html>
@@ -330,6 +423,8 @@ function printSingleEntry(serialNo, type, details, createdAt) {
         .card { border: 1px solid #ccc; border-radius: 8px; padding: 16px; }
         .row { margin-bottom: 10px; line-height: 1.5; }
         .label { font-weight: 700; }
+        .photo-block { margin-top: 14px; }
+        .photo { display: block; margin-top: 8px; width: 260px; max-width: 100%; border: 1px solid #ddd; border-radius: 8px; }
       </style>
     </head>
     <body>
@@ -339,6 +434,7 @@ function printSingleEntry(serialNo, type, details, createdAt) {
         <div class="row"><span class="label">Type:</span> ${type}</div>
         <div class="row"><span class="label">Details:</span> ${details}</div>
         <div class="row"><span class="label">Created At:</span> ${createdAt}</div>
+        ${photoHtml}
       </div>
     </body>
     </html>
@@ -372,7 +468,8 @@ forms.forEach((form) => {
 
     const details = formatFormData(formType, formData);
 
-    appendLogRow(formType, details);
+    const photoData = photoConfig ? String(formData.get(photoConfig.dataField) || "") : "";
+    appendLogRow(formType, details, photoData);
     form.reset();
 
     if (photoConfig) {
@@ -386,6 +483,23 @@ if (contentSection) {
   contentSection.addEventListener("click", (event) => {
   const target = event.target;
   if (!(target instanceof HTMLElement)) {
+    return;
+  }
+
+  if (target.classList.contains("user-delete-btn")) {
+    const username = target.dataset.username || "";
+    const session = typeof authGetSession === "function" ? authGetSession() : null;
+    if (!session || session.role !== "admin") return;
+    if (!username) return;
+    if (!confirm(`Delete user "${username}"?`)) return;
+
+    const result = authDeleteUser(username);
+    if (!result.ok) {
+      setUserFormMessage(result.error || "Unable to delete user.", "error");
+      return;
+    }
+    setUserFormMessage(`User "${username}" deleted.`, "success");
+    renderUsersTable();
     return;
   }
 
@@ -407,8 +521,9 @@ if (contentSection) {
   const details = cells[1].textContent?.trim() || "";
   const createdAt = cells[2].textContent?.trim() || "";
   const type = row.dataset.formType || "Entry";
+  const photoData = row.dataset.photoData || "";
 
-  printSingleEntry(serialNo, type, details, createdAt);
+  printSingleEntry(serialNo, type, details, createdAt, photoData);
   });
 }
 
@@ -439,6 +554,32 @@ photoConfigs.forEach((config) => {
     });
   }
 });
+
+if (addUserForm) {
+  addUserForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const session = typeof authGetSession === "function" ? authGetSession() : null;
+    if (!session || session.role !== "admin") {
+      setUserFormMessage("Only admin can add users.", "error");
+      return;
+    }
+
+    const formData = new FormData(addUserForm);
+    const username = String(formData.get("username") || "");
+    const password = String(formData.get("password") || "");
+    const role = String(formData.get("role") || "user");
+
+    const result = authAddUser({ username, password, role });
+    if (!result.ok) {
+      setUserFormMessage(result.error || "Unable to add user.", "error");
+      return;
+    }
+
+    addUserForm.reset();
+    setUserFormMessage(`User "${username.trim()}" added.`, "success");
+    renderUsersTable();
+  });
+}
 
 hydrateLogsFromStorage();
 

@@ -19,7 +19,12 @@
         <p>Security Management Dashboard</p>
       </div>
     </div>
-    <p class="top-bar-note">Manage visitor, inward, and outward entries</p>
+    <div class="top-bar-note">
+      <div id="authUserLine" style="font-size: 13px; opacity: 0.95;"></div>
+      <button type="button" id="logoutBtn" class="secondary-btn no-print" style="margin-top: 8px;">
+        Logout
+      </button>
+    </div>
   </header>
 
   <main class="layout">
@@ -27,6 +32,8 @@
       <button class="nav-btn active" data-target="visitor">Visitor Page</button>
       <button class="nav-btn" data-target="inward">Inward Page</button>
       <button class="nav-btn" data-target="outward">Outward Page</button>
+      <button class="nav-btn" id="usersNavBtn" data-target="users" style="display:none;">User Management</button>
+      <button class="nav-btn" id="adminDashBtn" style="display:none;">Admin Dashboard</button>
     </aside>
 
     <section class="content">
@@ -264,9 +271,63 @@
           </div>
         </div>
       </div>
+
+      <div id="users" class="panel">
+        <h2>User Management</h2>
+        <p style="margin-top:-6px; color:#4b5870; font-size:14px;">
+          Admin only: add or remove login users.
+        </p>
+
+        <div class="photo-capture-box" style="background:#fff;">
+          <p class="photo-title">Add New User</p>
+          <form id="addUserForm" class="user-form" style="max-width:520px;">
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+              <label>
+                Username
+                <input type="text" name="username" required />
+              </label>
+              <label>
+                Role
+                <select name="role" required>
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </label>
+              <label class="full-width">
+                Password
+                <input type="password" name="password" required />
+              </label>
+            </div>
+            <button type="submit">Add User</button>
+          </form>
+          <div id="userFormMsg" style="margin-top:10px; font-size:14px;"></div>
+        </div>
+
+        <div class="log-group panel-log">
+          <h3>Existing Users</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Role</th>
+                  <th>Created At</th>
+                  <th class="no-print">Action</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <tr>
+                  <td colspan="4" class="empty-row">No users found.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
+  <script src="auth.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
