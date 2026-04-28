@@ -90,6 +90,40 @@ if (adminAddUserForm) {
   });
 }
 
+if (adminChangePasswordForm) {
+  adminChangePasswordForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const sessionNow = typeof authGetSession === "function" ? authGetSession() : null;
+    if (!sessionNow || sessionNow.role !== "admin") {
+      if (adminChangePasswordMsg) {
+        adminChangePasswordMsg.textContent = "Admin only.";
+        adminChangePasswordMsg.style.color = "#8b1a1a";
+      }
+      return;
+    }
+
+    const formData = new FormData(adminChangePasswordForm);
+    const username = String(formData.get("username") || "").trim();
+    const newPassword = String(formData.get("newPassword") || "");
+
+    const result = authChangePassword(username, newPassword);
+    if (!result.ok) {
+      if (adminChangePasswordMsg) {
+        adminChangePasswordMsg.textContent = result.error || "Unable to change password.";
+        adminChangePasswordMsg.style.color = "#8b1a1a";
+      }
+      return;
+    }
+
+    adminChangePasswordForm.reset();
+    if (adminChangePasswordMsg) {
+      adminChangePasswordMsg.textContent = `Password changed for "${username}".`;
+      adminChangePasswordMsg.style.color = "#0d7a4f";
+    }
+    renderAdminUsersTable();
+  });
+}
+
 if (adminUsersTableBody) {
   adminUsersTableBody.addEventListener("click", (event) => {
     const target = event.target;
