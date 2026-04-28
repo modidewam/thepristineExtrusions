@@ -3,6 +3,8 @@ const logoutBtn = document.getElementById("logoutBtn");
 const goLogsBtn = document.getElementById("goLogsBtn");
 const adminAddUserForm = document.getElementById("adminAddUserForm");
 const adminUserFormMsg = document.getElementById("adminUserFormMsg");
+const adminChangePasswordForm = document.getElementById("adminChangePasswordForm");
+const adminChangePasswordMsg = document.getElementById("adminChangePasswordMsg");
 const adminUsersTableBody = document.getElementById("adminUsersTableBody");
 
 function setAdminUserFormMessage(message, type) {
