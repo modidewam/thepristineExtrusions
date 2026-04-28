@@ -10,6 +10,10 @@ const addUserForm = document.getElementById("addUserForm");
 const userFormMsg = document.getElementById("userFormMsg");
 const usersTableBody = document.getElementById("usersTableBody");
 const usersPanel = document.getElementById("users");
+const entryNumberInputs = {
+  visitor: document.getElementById("visitorEntryNo"),
+  inward: document.getElementById("inwardEntryNo"),
+};
 const STORAGE_KEY = "securityDashboardLogsV1";
 const logBodies = {
   visitor: document.getElementById("visitorLogBody"),
@@ -72,6 +76,24 @@ const logTypeMap = {
   Inward: "inward",
   Outward: "outward",
 };
+const REQUIRED_PHOTO_TYPES = new Set(["Visitor", "Outward"]);
+const filePhotoConfigs = [
+  {
+    input: document.getElementById("businessCardPhotoInput"),
+    preview: document.getElementById("businessCardPhotoPreview"),
+    dataInput: document.getElementById("businessCardPhotoData"),
+  },
+  {
+    input: document.getElementById("selfWeightSlipInput"),
+    preview: document.getElementById("selfWeightSlipPreview"),
+    dataInput: document.getElementById("selfWeightSlipData"),
+  },
+  {
+    input: document.getElementById("externalWeightSlipInput"),
+    preview: document.getElementById("externalWeightSlipPreview"),
+    dataInput: document.getElementById("externalWeightSlipData"),
+  },
+];
 
 const activeSession = typeof authRequireLoginOrRedirect === "function" ? authRequireLoginOrRedirect() : null;
 if (activeSession && activeSession.role === "admin") {
@@ -131,6 +153,16 @@ function loadStoredLogs() {
 
 function saveLogsToStorage(logs) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+}
+
+function updateEntryNumbers() {
+  Object.entries(entryNumberInputs).forEach(([key, input]) => {
+    if (!input) {
+      return;
+    }
+
+    input.value = String(serialCounters[key] + 1).padStart(4, "0");
+  });
 }
 
 function getCurrentLogsFromUI() {
@@ -259,6 +291,28 @@ function formatFormData(formType, formData) {
     entries.push(`Company: ${formData.get("company")}`);
     entries.push(`Purpose: ${formData.get("purpose")}`);
     entries.push("Photo: Captured");
+    if (formData.get("businessCardPhotoData")) {
+      entries.push("Business Card: Added");
+    }
+  } else if (formType === "Inward") {
+    entries.push(`Party: ${formData.get("name")}`);
+    entries.push(`Driver: ${formData.get("driverName")}`);
+    entries.push(`Driver No: ${formData.get("driverNo")}`);
+    entries.push(`Vehicle: ${formData.get("vehicle")}`);
+    entries.push(`Material: ${formData.get("material")}`);
+    entries.push(`Weight: ${formData.get("weight")} ${formData.get("unit")}`);
+    entries.push(`Company: ${formData.get("company")}`);
+    entries.push(`End User/Department: ${formData.get("endUserDepartment")}`);
+    if (formData.get("inwardPhotoData")) {
+      entries.push("Inward Photo: Captured");
+    }
+    const slipCount = ["selfWeightSlipData", "externalWeightSlipData"].reduce(
+      (count, field) => count + (formData.get(field) ? 1 : 0),
+      0
+    );
+    if (slipCount) {
+      entries.push(`Weight Slip Photos: ${slipCount}`);
+    }
   } else {
     entries.push(`From: ${formData.get("fromDetails")}`);
     entries.push(`To: ${formData.get("toDetails")}`);
@@ -292,6 +346,7 @@ function appendLogRow(formType, details, photoData) {
 
   const currentLogs = getCurrentLogsFromUI();
   saveLogsToStorage(currentLogs);
+  updateEntryNumbers();
 }
 
 function stopCameraCapture(config) {
@@ -398,6 +453,24 @@ function resetPhotoCapture(config) {
   }
 }
 
+function resetFilePhotoConfigs(form) {
+  filePhotoConfigs.forEach((config) => {
+    if (!config.input || !form.contains(config.input)) {
+      return;
+    }
+
+    config.input.value = "";
+    if (config.dataInput) {
+      config.dataInput.value = "";
+    }
+    if (config.preview) {
+      config.preview.src = "";
+      config.preview.style.display = "none";
+      config.preview.closest(".upload-tile")?.classList.remove("has-image");
+    }
+  });
+}
+
 function printSingleEntry(serialNo, type, details, createdAt, photoData) {
   const printWindow = window.open("", "_blank", "width=900,height=700");
   if (!printWindow) {
@@ -461,7 +534,7 @@ forms.forEach((form) => {
     const pageKey = (formType || "").toLowerCase();
     const photoConfig = photoByKey[pageKey];
 
-    if (photoConfig && !formData.get(photoConfig.dataField)) {
+    if (photoConfig && !formData.get(photoConfig.dataField) && REQUIRED_PHOTO_TYPES.has(formType)) {
       alert(`Please capture ${formType} photo before submitting.`);
       return;
     }
@@ -471,11 +544,13 @@ forms.forEach((form) => {
     const photoData = photoConfig ? String(formData.get(photoConfig.dataField) || "") : "";
     appendLogRow(formType, details, photoData);
     form.reset();
+    updateEntryNumbers();
 
     if (photoConfig) {
       resetPhotoCapture(photoConfig);
       stopCameraCapture(photoConfig);
     }
+    resetFilePhotoConfigs(form);
   });
 });
 
@@ -555,6 +630,33 @@ photoConfigs.forEach((config) => {
   }
 });
 
+filePhotoConfigs.forEach((config) => {
+  if (!config.input || !config.preview || !config.dataInput) {
+    return;
+  }
+
+  config.input.addEventListener("change", () => {
+    const file = config.input.files && config.input.files[0];
+    if (!file) {
+      config.dataInput.value = "";
+      config.preview.src = "";
+      config.preview.style.display = "none";
+      config.preview.closest(".upload-tile")?.classList.remove("has-image");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      const imageData = String(reader.result || "");
+      config.dataInput.value = imageData;
+      config.preview.src = imageData;
+      config.preview.style.display = "block";
+      config.preview.closest(".upload-tile")?.classList.add("has-image");
+    });
+    reader.readAsDataURL(file);
+  });
+});
+
 if (addUserForm) {
   addUserForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -582,6 +684,7 @@ if (addUserForm) {
 }
 
 hydrateLogsFromStorage();
+updateEntryNumbers();
 
 window.addEventListener("beforeunload", () => {
   photoConfigs.forEach((config) => {
