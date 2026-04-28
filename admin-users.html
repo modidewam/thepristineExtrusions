@@ -73,6 +73,24 @@
           <div id="adminUserFormMsg" style="margin-top:10px; font-size:14px;"></div>
         </div>
 
+        <div class="photo-capture-box" style="background:#fff; margin-top:18px;">
+          <p class="photo-title">Change User Password</p>
+          <form id="adminChangePasswordForm" class="user-form" style="max-width:520px;">
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+              <label class="full-width">
+                Username
+                <input type="text" name="username" required />
+              </label>
+              <label class="full-width">
+                New Password
+                <input type="password" name="newPassword" required />
+              </label>
+            </div>
+            <button type="submit">Change Password</button>
+          </form>
+          <div id="adminChangePasswordMsg" style="margin-top:10px; font-size:14px;"></div>
+        </div>
+
         <div class="log-group panel-log">
           <h3>Existing Users</h3>
           <div class="table-wrap">

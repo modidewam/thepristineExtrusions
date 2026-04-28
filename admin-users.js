@@ -3,6 +3,8 @@ const logoutBtn = document.getElementById("logoutBtn");
 const goLogsBtn = document.getElementById("goLogsBtn");
 const adminAddUserForm = document.getElementById("adminAddUserForm");
 const adminUserFormMsg = document.getElementById("adminUserFormMsg");
+const adminChangePasswordForm = document.getElementById("adminChangePasswordForm");
+const adminChangePasswordMsg = document.getElementById("adminChangePasswordMsg");
 const adminUsersTableBody = document.getElementById("adminUsersTableBody");
 
 function setAdminUserFormMessage(message, type) {
@@ -84,6 +86,40 @@ if (adminAddUserForm) {
 
     adminAddUserForm.reset();
     setAdminUserFormMessage(`User "${username.trim()}" added.`, "success");
+    renderAdminUsersTable();
+  });
+}
+
+if (adminChangePasswordForm) {
+  adminChangePasswordForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const sessionNow = typeof authGetSession === "function" ? authGetSession() : null;
+    if (!sessionNow || sessionNow.role !== "admin") {
+      if (adminChangePasswordMsg) {
+        adminChangePasswordMsg.textContent = "Admin only.";
+        adminChangePasswordMsg.style.color = "#8b1a1a";
+      }
+      return;
+    }
+
+    const formData = new FormData(adminChangePasswordForm);
+    const username = String(formData.get("username") || "").trim();
+    const newPassword = String(formData.get("newPassword") || "");
+
+    const result = authChangePassword(username, newPassword);
+    if (!result.ok) {
+      if (adminChangePasswordMsg) {
+        adminChangePasswordMsg.textContent = result.error || "Unable to change password.";
+        adminChangePasswordMsg.style.color = "#8b1a1a";
+      }
+      return;
+    }
+
+    adminChangePasswordForm.reset();
+    if (adminChangePasswordMsg) {
+      adminChangePasswordMsg.textContent = `Password changed for "${username}".`;
+      adminChangePasswordMsg.style.color = "#0d7a4f";
+    }
     renderAdminUsersTable();
   });
 }

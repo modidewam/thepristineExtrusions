@@ -34,7 +34,7 @@ function authEnsureSeedAdmin() {
 
   if (!hasAnyAdmin) {
     const salt = Math.random().toString(36).slice(2, 12);
-    const defaultPassword = "admin";
+    const defaultPassword = "PristineEXT@2027$$%";
 
     users.push({
       username: "admin",
@@ -69,7 +69,7 @@ function authResetDefaultCredentials() {
       username: "admin",
       role: "admin",
       salt: adminSalt,
-      passwordHash: authHashPassword("admin", adminSalt),
+      passwordHash: authHashPassword("PristineEXT@2027$$%", adminSalt),
       createdAt: new Date().toISOString(),
     },
     {
@@ -167,6 +167,21 @@ function authDeleteUser(username) {
   const users = authLoadUsers();
   const next = users.filter((u) => u && u.username !== username);
   authSaveUsers(next);
+  return { ok: true };
+}
+
+function authChangePassword(username, newPassword) {
+  if (!newPassword || newPassword.length < 4) {
+    return { ok: false, error: "Password must be at least 4 characters." };
+  }
+  const users = authLoadUsers();
+  const user = users.find((u) => u && u.username === username);
+  if (!user) return { ok: false, error: "User not found." };
+
+  const salt = Math.random().toString(36).slice(2, 12);
+  user.salt = salt;
+  user.passwordHash = authHashPassword(newPassword, salt);
+  authSaveUsers(users);
   return { ok: true };
 }
 
