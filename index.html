@@ -41,6 +41,10 @@
         <h2>Visitor Entry</h2>
         <form  name="contact"  class="entry-form" data-form-type="Visitor" method="POST" data-netlify="true">
           <div class="form-grid">
+            <label class="entry-number-label">
+              Visitor No :
+              <input type="text" name="entryNo" id="visitorEntryNo" readonly />
+            </label>
             <label>
               Name :
               <input type="text" name="name" required />
@@ -58,12 +62,25 @@
               <input type="text" name="purpose" required />
             </label>
             <div class="full-width photo-capture-box">
-              <p class="photo-title">Visitor Photo Capture</p>
-              <div class="photo-preview-wrap">
-                <video id="visitorVideo" class="photo-video" autoplay playsinline></video>
-                <img id="visitorPhotoPreview" class="photo-preview" alt="Captured visitor photo preview" />
+              <div class="photo-row">
+                <div>
+                  <p class="photo-title">Visitor Photo Capture <span class="required-note">Required</span></p>
+                  <div class="photo-preview-wrap">
+                    <video id="visitorVideo" class="photo-video" autoplay playsinline></video>
+                    <img id="visitorPhotoPreview" class="photo-preview" alt="Captured visitor photo preview" />
+                  </div>
+                </div>
+                <div>
+                  <p class="photo-title">Business Card Photo <span class="optional-note">Optional</span></p>
+                  <label class="upload-tile">
+                    <input type="file" name="businessCardPhoto" id="businessCardPhotoInput" accept="image/*" />
+                    <img id="businessCardPhotoPreview" class="photo-preview" alt="Business card preview" />
+                    <span>Choose Image</span>
+                  </label>
+                </div>
               </div>
               <input type="hidden" name="visitorPhotoData" id="visitorPhotoData" />
+              <input type="hidden" name="businessCardPhotoData" id="businessCardPhotoData" />
               <div class="photo-actions no-print">
                 <button type="button" id="startCameraBtn" class="secondary-btn">Start Camera</button>
                 <button type="button" id="flipVisitorCameraBtn" class="secondary-btn" disabled>Flip Camera</button>
@@ -102,55 +119,91 @@
         <h2>Inward Entry</h2>
         <form  name="contact" class="entry-form" data-form-type="Inward" method="POST" data-netlify="true">
           <div class="form-grid">
+            <label class="entry-number-label">
+              Inward No :
+              <input type="text" name="entryNo" id="inwardEntryNo" readonly />
+            </label>
             <label>
-              Name :
+              Party Name :
               <input type="text" name="name" required />
             </label>
             <label>
-              Phone :
-              <input type="tel" name="phone" required />
+              Driver Name :
+              <input type="text" name="driverName" required />
             </label>
-            
             <label>
-              Vehicle Details :
+              Vehicle Number :
               <input type="text" name="vehicle" required />
             </label>
             <label>
-              Material :
-              <input type="text" name="material" required />
+              Driver No. :
+              <input type="tel" name="driverNo" required />
             </label>
             <label>
               Weight :
               <input type="number" name="weight" min="0" step="0.01" required />
             </label>
             <label>
-              Unit
+              Material Type :
+              <select name="material" required>
+                <option value="">Select material</option>
+                <option value="scrap">Scrap</option>
+                <option value="gas">Gas</option>
+                <option value="dross">Dross</option>
+                <option value="packing">Packing Material</option>
+                <option value="raw-material">Raw Material</option>
+                <option value="tools">Tools</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+            <label>
+              Unit :
               <select name="unit" required>
                 <option value="">Select unit</option>
                 <option value="kg">kg</option>
+                <option value="ton">ton</option>
                 <option value="piece">piece</option>
                 <option value="box">box</option>
+                <option value="cylinder">cylinder</option>
               </select>
             </label>
             <label class="full-width">
               Company Name :
               <input type="text" name="company" required />
             </label>
-            <label>
-              From :
-              <input type="text" name="fromDetails" required />
-            </label>
-            <label>
-              To :
-              <input type="text" name="toDetails" required />
+            <label class="full-width">
+              End User / Department :
+              <input type="text" name="endUserDepartment" maxlength="16" required />
             </label>
             <div class="full-width photo-capture-box">
-              <p class="photo-title">Inward Photo Capture</p>
-              <div class="photo-preview-wrap">
-                <video id="inwardVideo" class="photo-video" autoplay playsinline></video>
-                <img id="inwardPhotoPreview" class="photo-preview" alt="Captured inward photo preview" />
+              <div class="photo-row">
+                <div>
+                  <p class="photo-title">Inward Photo Capture <span class="optional-note">Optional</span></p>
+                  <div class="photo-preview-wrap">
+                    <video id="inwardVideo" class="photo-video" autoplay playsinline></video>
+                    <img id="inwardPhotoPreview" class="photo-preview" alt="Captured inward photo preview" />
+                  </div>
+                </div>
+                <div>
+                  <p class="photo-title">Self Weight Slip <span class="optional-note">Optional</span></p>
+                  <label class="upload-tile">
+                    <input type="file" name="selfWeightSlip" id="selfWeightSlipInput" accept="image/*" />
+                    <img id="selfWeightSlipPreview" class="photo-preview" alt="Self weight slip preview" />
+                    <span>Choose Image</span>
+                  </label>
+                </div>
+                <div>
+                  <p class="photo-title">External Weight Scale Slip <span class="optional-note">Optional</span></p>
+                  <label class="upload-tile">
+                    <input type="file" name="externalWeightSlip" id="externalWeightSlipInput" accept="image/*" />
+                    <img id="externalWeightSlipPreview" class="photo-preview" alt="External weight slip preview" />
+                    <span>Choose Image</span>
+                  </label>
+                </div>
               </div>
               <input type="hidden" name="inwardPhotoData" id="inwardPhotoData" />
+              <input type="hidden" name="selfWeightSlipData" id="selfWeightSlipData" />
+              <input type="hidden" name="externalWeightSlipData" id="externalWeightSlipData" />
               <div class="photo-actions no-print">
                 <button type="button" id="startInwardCameraBtn" class="secondary-btn">Start Camera</button>
                 <button type="button" id="flipInwardCameraBtn" class="secondary-btn" disabled>Flip Camera</button>
