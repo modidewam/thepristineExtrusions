@@ -39,7 +39,7 @@
     <section class="content">
       <div id="visitor" class="panel active">
         <h2>Visitor Entry</h2>
-        <form class="entry-form" data-form-type="Visitor">
+        <form  name="contact"  class="entry-form" data-form-type="Visitor" method="POST" data-netlify="true">
           <div class="form-grid">
             <label>
               Name :
@@ -100,7 +100,7 @@
 
       <div id="inward" class="panel">
         <h2>Inward Entry</h2>
-        <form class="entry-form" data-form-type="Inward">
+        <form  name="contact" class="entry-form" data-form-type="Inward" method="POST" data-netlify="true">
           <div class="form-grid">
             <label>
               Name :
@@ -187,7 +187,7 @@
 
       <div id="outward" class="panel">
         <h2>Outward Entry</h2>
-        <form class="entry-form" data-form-type="Outward">
+        <form name="contact" class="entry-form" data-form-type="Outward" method="POST" data-netlify="true">
           <div class="form-grid">
             <label>
               Name :
@@ -280,7 +280,7 @@
 
         <div class="photo-capture-box" style="background:#fff;">
           <p class="photo-title">Add New User</p>
-          <form id="addUserForm" class="user-form" style="max-width:520px;">
+          <form name="contact" id="addUserForm" class="user-form" style="max-width:520px;" method="POST" data-netlify="true">
             <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
               <label>
                 Username
